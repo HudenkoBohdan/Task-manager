@@ -16,6 +16,7 @@
 ✨ Графический интерфейс(например, на Qt или SFML)
 */
 
+#include <iostream>
 #include "Task manager.h"
 
 template <class T>
@@ -25,17 +26,20 @@ void TaskList<T>::push_back(T data) {
 
 template <class T>
 void TaskList<T>::push_front(T data) {
+
     nodes.push_front(data);
 }
 
 template <class T>
-void TaskList<T>::push_back(T data) {
-    nodes.push_back(data);
+void TaskList<T>::print_forward() {
+    for (auto& data : nodes) {
+        cout << data << endl;
+    }
 }
 
 template <class T>
-void TaskList<T>::print_forward() {
-    for (auto data& : nodes) {
-        cout << data << endl;
+void TaskList<T>::print_backward() {
+    for (auto data = nodes.rbegin(); data != nodes.rend(); ++data) {
+        cout << *data << endl;
     }
 }
