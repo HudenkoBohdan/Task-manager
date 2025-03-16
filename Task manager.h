@@ -6,15 +6,25 @@
 
 using namespace std;
 
-//struct Task
-//{
-//    string title;
-//    string description;
-//    string due_date; //format (dd-mm-yy)
-//    int priority;
-//    Task(string t, string d, string d_d, int p) : title(t), description(d), due_date(d_d), priority(p) {}
-//
-//};
+struct Task
+{
+    string title;
+    string description;
+    string due_date; //format (dd-mm-yy)
+    int priority;
+    Task(string t, string d, string d_d, int p) : title(t), description(d), due_date(d_d), priority(p) {}
+
+    friend ostream& operator<<(ostream& os, const Task& task) 
+    {
+        os << "Tittle: " << task.title << "\n"
+            << "Description: " << task.description << "\n"
+            << "Due date (dd-mm-yy): " << task.due_date << "\n"
+            << "Priority: " << task.priority;
+        return os;
+
+    }
+
+};
 
 template <class T>
 class TaskList {
@@ -24,22 +34,8 @@ private:
 
 public:
     void push_back(T data);
-    void push_front(T data);
+    void push_front();
     void print_forward();
     void print_backward();
 
 };
-
-int main() {
-
-    TaskList<string> list;
-    string a;
-
-    getline(cin, a);
-    list.push_front(a);
-
-    list.print_forward();
-    list.print_backward();
-
-    return 0;
-}
