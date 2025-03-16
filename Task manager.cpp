@@ -25,15 +25,36 @@ void TaskList<T>::push_back(T data) {
 }
 
 template <class T>
-void TaskList<T>::push_front(T data) {
+void TaskList<T>::push_front() {
 
-    nodes.push_front(data);
+    string title, description, due_date;
+    int priority;
+
+    cout << "Enter title: " << endl;
+    getline(cin, title);
+    cout << endl;
+
+    cout << "Enter description: " << endl;
+    getline(cin, description);
+    cout << endl;
+
+    cout << "Enter due date (dd-mm-yy): " << endl;
+    getline(cin, due_date);
+    cout << endl;
+
+    cout << "Enter priority: " << endl;
+    cin >> priority;
+    cin.ignore();
+    cout << endl;
+
+    nodes.push_front(T(title, description, due_date, priority));
 }
 
 template <class T>
 void TaskList<T>::print_forward() {
     for (auto& data : nodes) {
         cout << data << endl;
+        cout << endl;
     }
 }
 
@@ -41,5 +62,19 @@ template <class T>
 void TaskList<T>::print_backward() {
     for (auto data = nodes.rbegin(); data != nodes.rend(); ++data) {
         cout << *data << endl;
+        cout << endl;
     }
+}
+
+int main() {
+
+    TaskList<Task> list;
+
+    list.push_front();
+    list.push_front();
+
+    list.print_forward();
+    list.print_backward();
+
+    return 0;
 }
