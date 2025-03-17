@@ -27,7 +27,7 @@ void TaskList<T>::push_back(T data) {
 template <class T>
 void TaskList<T>::push_front() {
 
-    string title, description, due_date;
+    string title, description, due_date, status;
     int priority;
 
     cout << "Enter title: " << endl;
@@ -42,12 +42,20 @@ void TaskList<T>::push_front() {
     getline(cin, due_date);
     cout << endl;
 
+    cout << "Status (1 - Complite, 2 - Active): " << endl;
+    cin >> status;
+    cout << endl;
+    if (status == "1")
+        status = "Complite";
+    else
+        status = "Active";
+
     cout << "Enter priority: " << endl;
     cin >> priority;
     cin.ignore();
     cout << endl;
 
-    nodes.push_front(T(title, description, due_date, priority));
+    nodes.push_front(T(title, description, due_date, status, priority));
 }
 
 template <class T>
@@ -66,15 +74,56 @@ void TaskList<T>::print_backward() {
     }
 }
 
+template <class T>
+void TaskList<T>::help() {
+    cout << "Commands List:" << endl
+        << "Add Task(add)" << endl
+        << "Print List(print)" << endl
+        << "Help(help)" << endl
+        << "Exit(exit)" << endl;
+
+}
+
+template <class T>
+void TaskList<T>::request(TaskList<Task>& list) {
+
+    string word = "";
+
+    help();
+
+    while (word != "exit") 
+    {
+        cin >> word;
+        cin.ignore();
+
+        transform(word.begin(), word.end(), word.begin(), ::tolower);
+
+        if (word == "add") 
+        {
+            list.push_front();
+            word = "";
+        }
+        else if (word == "print")
+            list.print_forward();
+        else if (word == "help")
+            help();
+
+    }
+     
+}
+
+
 int main() {
 
     TaskList<Task> list;
 
-    list.push_front();
-    list.push_front();
+    list.request(list);
 
-    list.print_forward();
-    list.print_backward();
+    //list.push_front();
+    //list.push_front();
+
+    //list.print_forward();
+    //list.print_backward();
 
     return 0;
 }
