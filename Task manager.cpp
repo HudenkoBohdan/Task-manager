@@ -42,20 +42,23 @@ void TaskList<T>::push_front() {
     getline(cin, due_date);
     cout << endl;
 
-    cout << "Status (1 - Complite, 2 - Active): " << endl;
-    cin >> status;
-    cout << endl;
-    if (status == "1")
-        status = "Complite";
-    else
-        status = "Active";
+    //cout << "Status (1 - Complite, 2 - Active): " << endl;
+    //cin >> status;
+    //cout << endl;
+    //if (status == "1")
+    //    status = "Complite";
+    //else
+    //    status = "Active";
+    status = "Active";
 
     cout << "Enter priority: " << endl;
     cin >> priority;
     cin.ignore();
     cout << endl;
 
-    nodes.push_front(T(title, description, due_date, status, priority));
+    nodes.push_front(T(title, description, due_date, status, priority, id));
+
+    id++;
 }
 
 template <class T>
@@ -76,12 +79,12 @@ void TaskList<T>::print_backward() {
 
 template <class T>
 void TaskList<T>::help() {
-    cout << "Commands List:" << endl
-        << "Add Task(add)" << endl
-        << "Print List(print)" << endl
-        << "Help(help)" << endl
-        << "Exit(exit)" << endl;
-
+    cout << "\n=========== COMMANDS LIST ===========\n"
+        << "Add Task     : add\n"
+        << "Print List   : print\n"
+        << "Help         : help\n"
+        << "Exit         : exit\n"
+        << "=====================================\n\n";
 }
 
 template <class T>
@@ -93,6 +96,7 @@ void TaskList<T>::request(TaskList<Task>& list) {
 
     while (word != "exit") 
     {
+        cin.clear();
         cin >> word;
         cin.ignore();
 
@@ -107,11 +111,37 @@ void TaskList<T>::request(TaskList<Task>& list) {
             list.print_forward();
         else if (word == "help")
             help();
+        else if (word == "del")
+            del(list);
 
     }
      
 }
 
+template <class T>
+void TaskList<T>::del(TaskList<Task>& list) {
+    int task_id;
+    cout << "Enter task Id to delete: ";
+    cin >> task_id;
+    cin.ignore();
+
+    auto it = nodes.begin();
+    while(it != nodes.end())
+    {
+        if (it->id == task_id)
+        {
+            it = nodes.erase(it);
+            cout << "Task with Id " << task_id << " deleted.\n";
+            return;
+        }
+        else 
+        {
+            ++it;
+        }
+    }
+    cout << "Task with ID " << task_id << " not found.\n";
+
+}
 
 int main() {
 

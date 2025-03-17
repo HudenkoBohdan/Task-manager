@@ -14,7 +14,8 @@ struct Task
     string due_date; //format (dd-mm-yy)
     string status;
     int priority;
-    Task(string t, string d, string d_d, string s, int p) : title(t), description(d), due_date(d_d), status(s), priority(p) {}
+    int id;
+    Task(string t, string d, string d_d, string s, int p, int i) : title(t), description(d), due_date(d_d), status(s), priority(p), id(i) {}
 
     friend ostream& operator<<(ostream& os, const Task& task) 
     {
@@ -22,7 +23,8 @@ struct Task
             << "Description: " << task.description << "\n"
             << "Due date (dd-mm-yy): " << task.due_date << "\n"
             << "Status: " << task.status << "\n"
-            << "Priority: " << task.priority;
+            << "Priority: " << task.priority << "\n"
+            << "Id: " << task.id;
         return os;
 
     }
@@ -33,7 +35,7 @@ template <class T>
 class TaskList {
 private:
     std::list<T> nodes;
-
+    int id = 0;
 
 public:
     void push_back(T data);
@@ -42,5 +44,6 @@ public:
     void print_backward();
     void help();
     void request(TaskList<Task>& list);
+    void del(TaskList<Task>& list);
 
 };
