@@ -41,9 +41,10 @@ public:
     void push_back(T data);
     void push_front();
     void print_forward();
-    void print_backward();
     void help();
     void request(TaskList<Task>& list);
     void del(TaskList<Task>& list);
+    void sort_by_priority();
+    void sort_id();
 
 };

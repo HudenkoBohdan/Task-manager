@@ -70,18 +70,12 @@ void TaskList<T>::print_forward() {
 }
 
 template <class T>
-void TaskList<T>::print_backward() {
-    for (auto data = nodes.rbegin(); data != nodes.rend(); ++data) {
-        cout << *data << endl;
-        cout << endl;
-    }
-}
-
-template <class T>
 void TaskList<T>::help() {
     cout << "\n=========== COMMANDS LIST ===========\n"
         << "Add Task     : add\n"
-        << "Print List   : print\n"
+        << "Task List    : print\n"
+        << "Delete Task  : del\n"
+        << "Sort Task    : sort\n"
         << "Help         : help\n"
         << "Exit         : exit\n"
         << "=====================================\n\n";
@@ -102,13 +96,18 @@ void TaskList<T>::request(TaskList<Task>& list) {
 
         transform(word.begin(), word.end(), word.begin(), ::tolower);
 
-        if (word == "add") 
+        if (word == "add")
         {
             list.push_front();
             word = "";
         }
         else if (word == "print")
             list.print_forward();
+        else if (word == "sort") 
+        {
+            list.sort_by_priority();
+            list.sort_id();
+        }
         else if (word == "help")
             help();
         else if (word == "del")
@@ -132,6 +131,21 @@ void TaskList<T>::del(TaskList<Task>& list) {
         {
             it = nodes.erase(it);
             cout << "Task with Id " << task_id << " deleted.\n";
+            id--;
+
+            auto it = nodes.rbegin();
+
+            while(it->id < task_id) 
+            {
+                it++;
+            }
+
+            while (it != nodes.rend()) 
+            {
+                it->id--;
+                it++;
+            }
+
             return;
         }
         else 
@@ -143,17 +157,30 @@ void TaskList<T>::del(TaskList<Task>& list) {
 
 }
 
+template<class T>
+void TaskList<T>::sort_by_priority()
+{
+    nodes.sort([](const Task& a, const Task& b) {
+        return a.priority < b.priority;
+        });
+}
+
+template<class T>
+void TaskList<T>::sort_id()
+{
+    int new_id = id - 1;
+    for (auto i = nodes.begin(); i != nodes.end(); i++)
+    {
+        i->id = new_id;
+        new_id--;
+    }
+}
+
 int main() {
 
     TaskList<Task> list;
 
     list.request(list);
-
-    //list.push_front();
-    //list.push_front();
-
-    //list.print_forward();
-    //list.print_backward();
 
     return 0;
 }
