@@ -62,10 +62,60 @@ void TaskList<T>::push_front() {
 }
 
 template <class T>
+void TaskList<T>::push_front(string title, string description, string due_date, int priority) {
+
+    string status = "Active";
+
+    nodes.push_front(T(title, description, due_date, status, priority, id));
+
+    id++;
+}
+
+template<class T>
+void TaskList<T>::random_task(TaskList<Task>& list)
+{
+    string title[] = { "Fix bug", "Develop feature", "Write documentation", "Refactor code", "Test application",
+        "Review pull request", "Deploy update", "Create design", "Update dependencies", "Implement UI" };
+
+    string description[] = {"Fix critical issue", "Implement a new feature", "Write detailed documentation",
+        "Improve code readability", "Test all features", "Review changes made by team",
+        "Deploy the latest update", "Design new user interface", "Update all dependencies",
+        "Improve UI/UX for better experience"};
+
+    string due_date[] = { "22-03-25", "11-04-25", "04-04-25", "09-04-25", "01-04-25",
+        "10-04-25", "28-03-25", "30-03-25", "14-04-25", "02-04-25" };
+
+    //vector<string> titles = {
+    //"Fix bug", "Develop feature", "Write documentation", "Refactor code", "Test application",
+    //"Review pull request", "Deploy update", "Create design", "Update dependencies", "Implement UI"
+    //};
+
+    //vector<string> descriptions = {
+    //    "Fix critical issue", "Implement a new feature", "Write detailed documentation",
+    //    "Improve code readability", "Test all features", "Review changes made by team",
+    //    "Deploy the latest update", "Design new user interface", "Update all dependencies",
+    //    "Improve UI/UX for better experience"
+    //};
+
+    //vector<string> due_dates = {
+    //    "22-03-25", "11-04-25", "04-04-25", "09-04-25", "01-04-25",
+    //    "10-04-25", "28-03-25", "30-03-25", "14-04-25", "02-04-25"
+    //};
+
+
+    int priority[] = {3, 5, 5, 3, 3, 4, 2, 4, 1, 5};
+
+    for (int i = 0; i < 10; i++) 
+    {
+        list.push_front(title[i], description[i], due_date[i], priority[i]);
+    }
+}
+
+template <class T>
 void TaskList<T>::print_forward() {
     for (auto& data : nodes) {
         cout << data << endl;
-        cout << endl;
+        cout << "=====================================\n";
     }
 }
 
@@ -76,6 +126,8 @@ void TaskList<T>::help() {
         << "Task List    : print\n"
         << "Delete Task  : del\n"
         << "Sort Task    : sort\n"
+        << "Random Task  : rand\n"
+        << "Clear        : clear\n"
         << "Help         : help\n"
         << "Exit         : exit\n"
         << "=====================================\n\n";
@@ -103,11 +155,15 @@ void TaskList<T>::request(TaskList<Task>& list) {
         }
         else if (word == "print")
             list.print_forward();
-        else if (word == "sort") 
+        else if (word == "sort")
         {
             list.sort_by_priority();
             list.sort_id();
         }
+        else if (word == "rand")
+            random_task(list);
+        else if (word == "clear")
+            system("cls");
         else if (word == "help")
             help();
         else if (word == "del")
@@ -164,6 +220,15 @@ void TaskList<T>::sort_by_priority()
         return a.priority < b.priority;
         });
 }
+
+//template<class T>
+//void TaskList<T>::sort_by_status()
+//{
+//    nodes.sort([](const Task& a, const Task& b) {
+//        if(a.status == "Active")
+//
+//        });
+//}
 
 template<class T>
 void TaskList<T>::sort_id()

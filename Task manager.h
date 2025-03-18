@@ -4,6 +4,8 @@
 #include <list>
 #include <string>
 #include <algorithm>
+#include <vector>
+
 
 using namespace std;
 
@@ -40,11 +42,14 @@ private:
 public:
     void push_back(T data);
     void push_front();
+    void push_front(string title, string description, string due_date, int priority);
+    void random_task(TaskList<Task>& list);// Для тестов
     void print_forward();
     void help();
     void request(TaskList<Task>& list);
     void del(TaskList<Task>& list);
     void sort_by_priority();
+    //void sort_by_status();
     void sort_id();
 
 };
