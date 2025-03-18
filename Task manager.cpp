@@ -64,7 +64,7 @@ void TaskList<T>::push_front() {
 template <class T>
 void TaskList<T>::push_front(string title, string description, string due_date, int priority) {
 
-    string status = "Complited";
+    string status = "Active";
 
     nodes.push_front(T(title, description, due_date, status, priority, id));
 
@@ -122,15 +122,14 @@ void TaskList<T>::print_forward() {
 template <class T>
 void TaskList<T>::help() {
     cout << "\n=========== COMMANDS LIST ===========\n"
-        << "Add Task       : add\n"
-        << "Task List      : print\n"
-        << "Delete Task    : del\n"
-        << "Sort Task      : sort\n"
-        << "Sort by status : sorts\n"
-        << "Random Task    : rand\n"
-        << "Clear          : clear\n"
-        << "Help           : help\n"
-        << "Exit           : exit\n"
+        << "Add Task     : add\n"
+        << "Task List    : print\n"
+        << "Delete Task  : del\n"
+        << "Sort Task    : sort\n"
+        << "Random Task  : rand\n"
+        << "Clear        : clear\n"
+        << "Help         : help\n"
+        << "Exit         : exit\n"
         << "=====================================\n\n";
 }
 
@@ -159,11 +158,6 @@ void TaskList<T>::request(TaskList<Task>& list) {
         else if (word == "sort")
         {
             list.sort_by_priority();
-            list.sort_id();
-        }
-        else if (word == "sorts")
-        {
-            list.sort_by_status();
             list.sort_id();
         }
         else if (word == "rand")
@@ -227,24 +221,14 @@ void TaskList<T>::sort_by_priority()
         });
 }
 
-template<class T>
-void TaskList<T>::sort_by_status()
-{
-    nodes.sort([](const Task& a, const Task& b) {
-        if (a.status == "Active" && b.status != "Active") 
-        {
-            return true;
-        }
-        else if (a.status != "Active" && b.status == "Active") 
-        {
-            return false;
-        }
-        else
-        {
-            return false;
-        }
-        });
-}
+//template<class T>
+//void TaskList<T>::sort_by_status()
+//{
+//    nodes.sort([](const Task& a, const Task& b) {
+//        if(a.status == "Active")
+//
+//        });
+//}
 
 template<class T>
 void TaskList<T>::sort_id()
