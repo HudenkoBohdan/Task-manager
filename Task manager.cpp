@@ -2,10 +2,10 @@
 Функционал проекта
 🔹 Основные возможности :
 ✅ Добавление новой задачи(заголовок, описание, срок выполнения, приоритет) - Сделанно
-✅ Просмотр списка задач(отображение активных, выполненных) - Сделанно !!!(Можно добавить режим скрития активных или выполненых)
+✅ Просмотр списка задач(отображение активных, выполненных) - Сделанно (Можно добавить режим скрития активных или выполненых) - Добавил
 ✅ Редактирование задачи(изменение параметров) - Сделанно
 ✅ Удаление задачи - Сделанно
-✅ Пометка задачи как выполненной - Сделанно !!!(Можно сделать через отдельную функцию)
+✅ Пометка задачи как выполненной - Сделанно (Можно сделать через отдельную функцию) - Сделанно
 ✅ Сохранение задач в файле(или базе данных) - Не сделанно !!!
 ✅ Сортировка задач(по сроку, приоритету) - Сделано по приоритету !!!
 
@@ -17,6 +17,23 @@
 
 #include <iostream>
 #include "Task manager.h"
+
+template<class T>
+string TaskList<T>::getCurrentDate()
+{
+    auto now = chrono::system_clock::now();
+    time_t now_time = chrono::system_clock::to_time_t(now);
+
+    tm localTime{};
+    localtime_s(&localTime, &now_time);
+
+    ostringstream dateStream;
+    dateStream << setw(2) << setfill('0') << localTime.tm_mday << "-"
+        << setw(2) << setfill('0') << (localTime.tm_mon + 1) << "-"
+        << setw(2) << setfill('0') << (localTime.tm_year % 100);
+
+    return dateStream.str();
+}
 
 template <class T>
 void TaskList<T>::push_front() {
@@ -36,19 +53,17 @@ void TaskList<T>::push_front() {
     getline(cin, due_date);
     cout << endl;
 
-    //cout << "Status (1 - Complite, 2 - Active): " << endl;
-    //cin >> status;
-    //cout << endl;
-    //if (status == "1")
-    //    status = "Complite";
-    //else
-    //    status = "Active";
     status = "Active";
 
-    cout << "Enter priority: " << endl;
+    cout << "Enter priority (1 - Hight, 5 - Low): " << endl;
     cin >> priority;
     cin.ignore();
     cout << endl;
+
+    if (priority > 5 || priority < 1)
+    {
+        priority = 5;
+    }
 
     nodes.push_front(T(title, description, due_date, status, priority, id));
 
@@ -79,24 +94,6 @@ void TaskList<T>::random_task(TaskList<Task>& list)
     string due_date[] = { "22-03-25", "11-04-25", "04-04-25", "09-04-25", "01-04-25",
         "10-04-25", "28-03-25", "30-03-25", "14-04-25", "02-04-25" };
 
-    //vector<string> titles = {
-    //"Fix bug", "Develop feature", "Write documentation", "Refactor code", "Test application",
-    //"Review pull request", "Deploy update", "Create design", "Update dependencies", "Implement UI"
-    //};
-
-    //vector<string> descriptions = {
-    //    "Fix critical issue", "Implement a new feature", "Write detailed documentation",
-    //    "Improve code readability", "Test all features", "Review changes made by team",
-    //    "Deploy the latest update", "Design new user interface", "Update all dependencies",
-    //    "Improve UI/UX for better experience"
-    //};
-
-    //vector<string> due_dates = {
-    //    "22-03-25", "11-04-25", "04-04-25", "09-04-25", "01-04-25",
-    //    "10-04-25", "28-03-25", "30-03-25", "14-04-25", "02-04-25"
-    //};
-
-
     int priority[] = {3, 5, 5, 3, 3, 4, 2, 4, 1, 5};
 
     for (int i = 0; i < 10; i++) 
@@ -106,11 +103,41 @@ void TaskList<T>::random_task(TaskList<Task>& list)
 }
 
 template <class T>
-void TaskList<T>::print_forward() {
-    for (auto& data : nodes) {
-        cout << data << endl;
-        cout << "=====================================\n";
+void TaskList<T>::print_forward(int hide_active, int hide_complited) {
+    if (hide_active == 0 && hide_complited == 0)
+    {
+        for (auto& data : nodes) 
+        {
+            cout << data << endl;
+            cout << "=====================================\n";
+        }
     }
+
+    else if (hide_active == 0 && hide_complited == 1)
+    {
+        for (auto data = nodes.begin(); data != nodes.end(); data++)
+        {
+            if (data->status == "Active")
+            {
+                cout << *data << endl;
+                cout << "=====================================\n";
+            }
+
+        }
+    }
+    else if (hide_active == 1 && hide_complited == 0)
+    {
+        for (auto data = nodes.begin(); data != nodes.end(); data++)
+        {
+            if (data->status == "Complited")
+            {
+                cout << *data << endl;
+                cout << "=====================================\n";
+            }
+
+        }
+    }
+
 }
 
 template <class T>
@@ -119,21 +146,24 @@ void TaskList<T>::help() {
         << "Add Task       : add\n"
         << "Task List      : print\n"
         << "Delete Task    : del\n"
+        << "Complite Task  : comp\n"
         << "Sort Task      : sort\n"
         << "Sort by status : sorts\n"
         << "Random Task    : rand\n"
         << "Edit Task      : edit\n"
+        << "Hide Active    : ha\n"
+        << "Hide Complited : hc\n"
         << "Clear          : clear\n"
         << "Help           : help\n"
         << "Exit           : exit\n"
         << "=====================================\n\n";
 }
 
+
 template <class T>
 void TaskList<T>::request(TaskList<Task>& list) {
 
     string userChoice = "";
-
     help();
 
     while (userChoice != "exit") 
@@ -150,7 +180,11 @@ void TaskList<T>::request(TaskList<Task>& list) {
             userChoice = "";
         }
         else if (userChoice == "print")
-            list.print_forward();
+            list.print_forward(hide_active, hide_complited);
+        else if (userChoice == "del")
+            del(list);
+        else if (userChoice == "comp")
+            complite(list);
         else if (userChoice == "sort")
         {
             list.sort_by_priority();
@@ -165,12 +199,37 @@ void TaskList<T>::request(TaskList<Task>& list) {
             random_task(list);
         else if (userChoice == "edit")
             edit(list);
+        else if (userChoice == "ha")
+        {
+            if (hide_active == 0)
+            {
+                cout << "Active tasks are now hidden" << endl;
+                hide_active = 1;
+            }
+            else
+            {
+                cout << "Active tasks are now displayed" << endl;
+                hide_active = 0;
+            }
+        }
+        else if (userChoice == "hc")
+        {
+            if (hide_complited == 0)
+            {
+                cout << "Complited tasks are now hidden" << endl;
+                hide_complited = 1;
+            }
+            else
+            {
+                cout << "Complited tasks are now displayed" << endl;
+                hide_complited = 0;
+            }
+        }
         else if (userChoice == "clear")
             system("cls");
         else if (userChoice == "help")
             help();
-        else if (userChoice == "del")
-            del(list);
+
 
     }
      
@@ -255,10 +314,16 @@ void TaskList<T>::sort_id()
 }
 
 template<class T>
+void TaskList<T>::sort_by_date(TaskList<Task>& list)
+{
+
+}
+
+template<class T>
 void TaskList<T>::edit(TaskList<Task>& list)
 {
     int task_id;
-    cout << "Enter task id to edit: ";
+    cout << "Enter the task id to edit: ";
     cin >> task_id;
     if (task_id > id) 
     {
@@ -266,7 +331,7 @@ void TaskList<T>::edit(TaskList<Task>& list)
     }
     else
     {
-        int selection = 0;
+        string selection = "0";
         auto selected_node = nodes.begin();
 
         for (; selected_node->id != task_id; selected_node++){}
@@ -279,12 +344,12 @@ void TaskList<T>::edit(TaskList<Task>& list)
              << "5 - Change priority\n"
              << "6 - Exit\n";
 
-        while (selection != 6) 
+        while (selection != "6")
         {
             cin >> selection;
             cin.ignore();
             
-            if (selection == 1)
+            if (selection == "1")
             {
                 string new_title;
                 cout << "Enter new title: ";
@@ -292,7 +357,7 @@ void TaskList<T>::edit(TaskList<Task>& list)
                 selected_node->title = new_title;
             }
 
-            else if (selection == 2)
+            else if (selection == "2")
             {
                 string new_description;
                 cout << "Enter new description: ";
@@ -300,7 +365,7 @@ void TaskList<T>::edit(TaskList<Task>& list)
                 selected_node->description = new_description;
             }
 
-            else if (selection == 3)
+            else if (selection == "3")
             {
                 string new_due_date;
                 cout << "Enter new due date: ";
@@ -308,7 +373,7 @@ void TaskList<T>::edit(TaskList<Task>& list)
                 selected_node->due_date = new_due_date;
             }
 
-            else if (selection == 4)
+            else if (selection == "4")
             {
                 int new_status;
                 cout << "Enter new status (1 - Active; 2 - Complited): ";
@@ -324,7 +389,7 @@ void TaskList<T>::edit(TaskList<Task>& list)
                 }
             }
 
-            else if (selection == 5)
+            else if (selection == "5")
             {
                 int new_priority;
                 cout << "Enter new priority (1 - Hight, 5 - Low): ";
@@ -340,6 +405,26 @@ void TaskList<T>::edit(TaskList<Task>& list)
                 }
             }
         }
+    }
+}
+
+template<class T>
+void TaskList<T>::complite(TaskList<Task>& list)
+{
+    int task_id;
+    cout << "Enter the task id to complite: ";
+    cin >> task_id;
+    if (task_id > id)
+    {
+        cout << "Task with " << task_id << " not found" << endl;
+    }
+    else
+    {
+        auto selected_node = nodes.begin();
+
+        for (; selected_node->id != task_id; selected_node++) {}
+
+        selected_node->status = "Complited";
     }
 }
 
