@@ -1,28 +1,22 @@
 ﻿/*
 Функционал проекта
 🔹 Основные возможности :
-✅ Добавление новой задачи(заголовок, описание, срок выполнения, приоритет)
-✅ Просмотр списка задач(отображение активных, выполненных)
-✅ Редактирование задачи(изменение параметров)
-✅ Удаление задачи
-✅ Пометка задачи как выполненной
-✅ Сохранение задач в файле(или базе данных)
-✅ Сортировка задач(по сроку, приоритету)
+✅ Добавление новой задачи(заголовок, описание, срок выполнения, приоритет) - Сделанно
+✅ Просмотр списка задач(отображение активных, выполненных) - Сделанно !!!(Можно добавить режим скрития активных или выполненых)
+✅ Редактирование задачи(изменение параметров) - Сделанно
+✅ Удаление задачи - Сделанно
+✅ Пометка задачи как выполненной - Сделанно !!!(Можно сделать через отдельную функцию)
+✅ Сохранение задач в файле(или базе данных) - Не сделанно !!!
+✅ Сортировка задач(по сроку, приоритету) - Сделано по приоритету !!!
 
 🔹 Дополнительные возможности :
-✨ Напоминания(например, если срок выполнения истекает)
-✨ Категории задач(например, "Работа", "Учёба", "Личное")
-✨ Экспорт задач в JSON / CSV
-✨ Графический интерфейс(например, на Qt или SFML)
+✨ Напоминания(например, если срок выполнения истекает) - Надо посмотреть !!!
+✨ Категории задач(например, "Работа", "Учёба", "Личное") - Надо сделать!!!
+✨ Экспорт задач в JSON / CSV - Можно попробовать реализовать !!!
 */
 
 #include <iostream>
 #include "Task manager.h"
-
-template <class T>
-void TaskList<T>::push_back(T data) {
-    nodes.push_back(data);
-}
 
 template <class T>
 void TaskList<T>::push_front() {
@@ -128,6 +122,7 @@ void TaskList<T>::help() {
         << "Sort Task      : sort\n"
         << "Sort by status : sorts\n"
         << "Random Task    : rand\n"
+        << "Edit Task      : edit\n"
         << "Clear          : clear\n"
         << "Help           : help\n"
         << "Exit           : exit\n"
@@ -137,42 +132,44 @@ void TaskList<T>::help() {
 template <class T>
 void TaskList<T>::request(TaskList<Task>& list) {
 
-    string word = "";
+    string userChoice = "";
 
     help();
 
-    while (word != "exit") 
+    while (userChoice != "exit") 
     {
         cin.clear();
-        cin >> word;
+        cin >> userChoice;
         cin.ignore();
 
-        transform(word.begin(), word.end(), word.begin(), ::tolower);
+        transform(userChoice.begin(), userChoice.end(), userChoice.begin(), ::tolower);
 
-        if (word == "add")
+        if (userChoice == "add")
         {
             list.push_front();
-            word = "";
+            userChoice = "";
         }
-        else if (word == "print")
+        else if (userChoice == "print")
             list.print_forward();
-        else if (word == "sort")
+        else if (userChoice == "sort")
         {
             list.sort_by_priority();
             list.sort_id();
         }
-        else if (word == "sorts")
+        else if (userChoice == "sorts")
         {
             list.sort_by_status();
             list.sort_id();
         }
-        else if (word == "rand")
+        else if (userChoice == "rand")
             random_task(list);
-        else if (word == "clear")
+        else if (userChoice == "edit")
+            edit(list);
+        else if (userChoice == "clear")
             system("cls");
-        else if (word == "help")
+        else if (userChoice == "help")
             help();
-        else if (word == "del")
+        else if (userChoice == "del")
             del(list);
 
     }
@@ -254,6 +251,95 @@ void TaskList<T>::sort_id()
     {
         i->id = new_id;
         new_id--;
+    }
+}
+
+template<class T>
+void TaskList<T>::edit(TaskList<Task>& list)
+{
+    int task_id;
+    cout << "Enter task id to edit: ";
+    cin >> task_id;
+    if (task_id > id) 
+    {
+        cout << "Task with " << task_id << " not found" << endl;
+    }
+    else
+    {
+        int selection = 0;
+        auto selected_node = nodes.begin();
+
+        for (; selected_node->id != task_id; selected_node++){}
+
+        cout << *selected_node << endl;
+        cout << "1 - Change title\n"
+             << "2 - Change description\n"
+             << "3 - Change due date\n"
+             << "4 - Change status\n"
+             << "5 - Change priority\n"
+             << "6 - Exit\n";
+
+        while (selection != 6) 
+        {
+            cin >> selection;
+            cin.ignore();
+            
+            if (selection == 1)
+            {
+                string new_title;
+                cout << "Enter new title: ";
+                getline(cin, new_title);
+                selected_node->title = new_title;
+            }
+
+            else if (selection == 2)
+            {
+                string new_description;
+                cout << "Enter new description: ";
+                getline(cin, new_description);
+                selected_node->description = new_description;
+            }
+
+            else if (selection == 3)
+            {
+                string new_due_date;
+                cout << "Enter new due date: ";
+                getline(cin, new_due_date);
+                selected_node->due_date = new_due_date;
+            }
+
+            else if (selection == 4)
+            {
+                int new_status;
+                cout << "Enter new status (1 - Active; 2 - Complited): ";
+                cin >> new_status;
+                cin.ignore();
+                if (new_status == 2)
+                {
+                    selected_node->status = "Complited";
+                }
+                else
+                {
+                    selected_node->status = "Active";
+                }
+            }
+
+            else if (selection == 5)
+            {
+                int new_priority;
+                cout << "Enter new priority (1 - Hight, 5 - Low): ";
+                cin >> new_priority;
+                cin.ignore();
+                if (new_priority > 5 || new_priority < 1)
+                {
+                    selected_node->priority = 5;
+                }
+                else
+                {
+                    selected_node->priority = new_priority;
+                }
+            }
+        }
     }
 }
 

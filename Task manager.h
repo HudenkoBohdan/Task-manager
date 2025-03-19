@@ -40,7 +40,6 @@ private:
     int id = 0;
 
 public:
-    void push_back(T data);
     void push_front();
     void push_front(string title, string description, string due_date, int priority);
     void random_task(TaskList<Task>& list);// Для тестов
@@ -51,5 +50,6 @@ public:
     void sort_by_priority();
     void sort_by_status();
     void sort_id();
+    void edit(TaskList<Task>& list);
 
 };
