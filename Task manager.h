@@ -11,7 +11,7 @@
 #include <regex>
 #include <tuple>
 #include <fstream>
-
+#include <sstream>
 
 using namespace std;
 
@@ -83,6 +83,7 @@ private:
     void edit_commands_list();
     void complite(TaskList<Task>& list);
     void save_to_csv(TaskList<Task>& list);
+    void load_from_csv(TaskList<Task>& list);
 
 public:
 

@@ -6,13 +6,13 @@
 ✅ Редактирование задачи(изменение параметров) - Сделанно
 ✅ Удаление задачи - Сделанно
 ✅ Пометка задачи как выполненной - Сделанно (Можно сделать через отдельную функцию) - Сделанно
-✅ Сохранение задач в файле(или базе данных) - Не сделанно !!!
+✅ Сохранение задач в файле(или базе данных) - Сделанно
 ✅ Сортировка задач(по сроку, приоритету) - Сделано
 
 🔹 Дополнительные возможности :
 ✨ Напоминания(например, если срок выполнения истекает) - Надо посмотреть !!!
 ✨ Категории задач(например, "Работа", "Учёба", "Личное") - Надо сделать!!!
-✨ Экспорт задач в JSON / CSV - Можно попробовать реализовать !!!
+✨ Экспорт задач в JSON / CSV - Сделанно с CSV
 */
 
 #include <iostream>
@@ -200,6 +200,7 @@ void TaskList<T>::help() {
         << "Hide Active        : ha\n"
         << "Hide Complited     : hc\n"
         << "Save to File       : sf\n"
+        << "Load from File     : lf\n"
         << "Clear              : clear\n"
         << "Help               : help\n"
         << "Exit               : exit\n"
@@ -234,6 +235,7 @@ void TaskList<T>::request(TaskList<Task>& list) {
         else if (userChoice == "del") 
         {
             del(list);
+            list.sort_id();
             continue;
         }
         else if (userChoice == "comp")
@@ -304,6 +306,11 @@ void TaskList<T>::request(TaskList<Task>& list) {
         else if (userChoice == "sf")
         {
             save_to_csv(list);
+            continue;
+        } 
+        else if (userChoice == "lf")
+        {
+            load_from_csv(list);
             continue;
         }
         else if (userChoice == "clear") 
@@ -574,6 +581,64 @@ void TaskList<T>::save_to_csv(TaskList<Task>& list)
 
     file.close();
     cout << "Tasks saved to " << filename << "\n";
+
+}
+
+template<class T>
+void TaskList<T>::load_from_csv(TaskList<Task>& list)
+{
+    string filename = "file.csv";
+
+    while (true) {
+        cout << "Enter file name(latters and numbers): ";
+        getline(cin, filename);
+
+        std::regex filenamePattern("^[a-zA-Z0-9_]+$");
+        std::smatch match;
+
+        if (!std::regex_match(filename, match, filenamePattern)) {
+            cout << "Invalid file name\n";
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    filename += ".csv";
+
+    ifstream file(filename);
+
+    if (!file)
+    {
+        cout << "Error: Unable to open file for writing!\n";
+        return;
+    }
+
+    string line;
+
+    getline(file, line);
+
+    while (getline(file,line)) 
+    {
+        stringstream ss(line);
+        
+        string title, description, due_date, add_date, status, priority, id;
+
+        getline(ss, id, ',');
+        getline(ss, title, ',');
+        getline(ss, description, ',');
+        getline(ss, due_date, ',');
+        getline(ss, add_date, ',');
+        getline(ss, status, ',');
+        getline(ss, priority, ',');
+
+        nodes.push_front(T(title, description, due_date, add_date, status, stoi(priority), stoi(id)));
+        list.id++;
+    }
+
+    file.close();
+    cout << "Tasks loaded from " << filename << "\n";
 
 }
 
