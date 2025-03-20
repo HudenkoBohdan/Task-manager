@@ -7,7 +7,7 @@
 ✅ Удаление задачи - Сделанно
 ✅ Пометка задачи как выполненной - Сделанно (Можно сделать через отдельную функцию) - Сделанно
 ✅ Сохранение задач в файле(или базе данных) - Не сделанно !!!
-✅ Сортировка задач(по сроку, приоритету) - Сделано по приоритету !!!
+✅ Сортировка задач(по сроку, приоритету) - Сделано
 
 🔹 Дополнительные возможности :
 ✨ Напоминания(например, если срок выполнения истекает) - Надо посмотреть !!!
@@ -35,11 +35,42 @@ string TaskList<T>::getCurrentDate()
     return dateStream.str();
 }
 
+template<class T>
+bool TaskList<T>::date_verification(string date)
+{
+
+    std::regex datePattern(R"(^(\d{2})-(\d{2})-(\d{2})$)");
+    std::smatch match;
+
+    if (!std::regex_match(date, match, datePattern)) {
+        return false;
+    }
+
+    char dash = '-';
+    int day, mounth, year;
+
+    istringstream dateStream(date);
+    dateStream >> day >> dash >> mounth >> dash >> year;
+
+    if (mounth < 1 || mounth > 12) return false;
+    
+    int daysInMouth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+    if (year % 4 == 0) 
+    {
+        daysInMouth[1] = 29;
+    }
+
+    if (day < 1 || day > daysInMouth[mounth - 1]) return false;
+
+    return true;
+}
+
 template <class T>
 void TaskList<T>::push_front() {
 
-    string title, description, due_date, status;
-    int priority;
+    string title = "", description = "", due_date = "01-01-01", status = "";
+    int priority = 0;
 
     cout << "Enter title: " << endl;
     getline(cin, title);
@@ -49,14 +80,27 @@ void TaskList<T>::push_front() {
     getline(cin, description);
     cout << endl;
 
-    cout << "Enter due date (dd-mm-yy): " << endl;
-    getline(cin, due_date);
-    cout << endl;
+    while (true) 
+    {
+        cout << "Enter due date (dd-mm-yy): " << endl;
+        getline(cin, due_date);
+        cout << endl;
+        if (date_verification(due_date))
+        {
+            break;
+        }
+        else
+        {
+            cout << "Invalid due date\n";
+        }
+    }
+
 
     status = "Active";
 
     cout << "Enter priority (1 - Hight, 5 - Low): " << endl;
     cin >> priority;
+    cin.clear();
     cin.ignore();
     cout << endl;
 
@@ -65,7 +109,7 @@ void TaskList<T>::push_front() {
         priority = 5;
     }
 
-    nodes.push_front(T(title, description, due_date, status, priority, id));
+    nodes.push_front(T(title, description, due_date, getCurrentDate(), status, priority, id));
 
     id++;
 }
@@ -75,7 +119,7 @@ void TaskList<T>::push_front(string title, string description, string due_date, 
 
     string status = "Complited";
 
-    nodes.push_front(T(title, description, due_date, status, priority, id));
+    nodes.push_front(T(title, description, due_date, getCurrentDate(), status, priority, id));
 
     id++;
 }
@@ -143,19 +187,22 @@ void TaskList<T>::print_forward(int hide_active, int hide_complited) {
 template <class T>
 void TaskList<T>::help() {
     cout << "\n=========== COMMANDS LIST ===========\n"
-        << "Add Task       : add\n"
-        << "Task List      : print\n"
-        << "Delete Task    : del\n"
-        << "Complite Task  : comp\n"
-        << "Sort Task      : sort\n"
-        << "Sort by status : sorts\n"
-        << "Random Task    : rand\n"
-        << "Edit Task      : edit\n"
-        << "Hide Active    : ha\n"
-        << "Hide Complited : hc\n"
-        << "Clear          : clear\n"
-        << "Help           : help\n"
-        << "Exit           : exit\n"
+        << "Add Task           : add\n"
+        << "Task List          : print\n"
+        << "Delete Task        : del\n"
+        << "Complite Task      : comp\n"
+        << "Sort by priority   : sp\n"
+        << "Sort by status     : ss\n"
+        << "Sort by due date   : sd\n"
+        << "Reverse List       : rt\n"
+        << "Random Task        : rd\n"
+        << "Edit Task          : edit\n"
+        << "Hide Active        : ha\n"
+        << "Hide Complited     : hc\n"
+        << "Save to File       : sf\n"
+        << "Clear              : clear\n"
+        << "Help               : help\n"
+        << "Exit               : exit\n"
         << "=====================================\n\n";
 }
 
@@ -177,28 +224,55 @@ void TaskList<T>::request(TaskList<Task>& list) {
         if (userChoice == "add")
         {
             list.push_front();
-            userChoice = "";
+            continue;
         }
-        else if (userChoice == "print")
+        else if (userChoice == "print") 
+        {
             list.print_forward(hide_active, hide_complited);
-        else if (userChoice == "del")
+            continue;
+        }
+        else if (userChoice == "del") 
+        {
             del(list);
+            continue;
+        }
         else if (userChoice == "comp")
+        {
             complite(list);
-        else if (userChoice == "sort")
+            continue;
+        }
+        else if (userChoice == "sp")
         {
             list.sort_by_priority();
             list.sort_id();
+            continue;
         }
-        else if (userChoice == "sorts")
+        else if (userChoice == "ss")
         {
             list.sort_by_status();
             list.sort_id();
+            continue;
         }
-        else if (userChoice == "rand")
+        else if (userChoice == "sd")
+        {
+            sort_by_date(list);
+            list.sort_id();
+            continue;
+        }
+        else if (userChoice == "rv")
+        {
+            nodes.reverse();
+        }
+        else if (userChoice == "rd")
+        {
             random_task(list);
-        else if (userChoice == "edit")
+            continue;
+        }
+        else if (userChoice == "edit") 
+        {
             edit(list);
+            continue;
+        }
         else if (userChoice == "ha")
         {
             if (hide_active == 0)
@@ -211,6 +285,7 @@ void TaskList<T>::request(TaskList<Task>& list) {
                 cout << "Active tasks are now displayed" << endl;
                 hide_active = 0;
             }
+            continue;
         }
         else if (userChoice == "hc")
         {
@@ -224,11 +299,27 @@ void TaskList<T>::request(TaskList<Task>& list) {
                 cout << "Complited tasks are now displayed" << endl;
                 hide_complited = 0;
             }
+            continue;
         }
-        else if (userChoice == "clear")
+        else if (userChoice == "sf")
+        {
+            save_to_csv(list);
+            continue;
+        }
+        else if (userChoice == "clear") 
+        {
             system("cls");
-        else if (userChoice == "help")
+            continue;
+        }
+        else if (userChoice == "help") 
+        {
             help();
+            continue;
+        }
+        else
+        {
+            cout << "Invalid command, type 'help' for a list of commands\n";
+        }
 
 
     }
@@ -316,7 +407,9 @@ void TaskList<T>::sort_id()
 template<class T>
 void TaskList<T>::sort_by_date(TaskList<Task>& list)
 {
-
+    nodes.sort([](const Task& a, const Task& b) {
+        return a.parseData() < b.parseData();
+        });
 }
 
 template<class T>
@@ -337,12 +430,7 @@ void TaskList<T>::edit(TaskList<Task>& list)
         for (; selected_node->id != task_id; selected_node++){}
 
         cout << *selected_node << endl;
-        cout << "1 - Change title\n"
-             << "2 - Change description\n"
-             << "3 - Change due date\n"
-             << "4 - Change status\n"
-             << "5 - Change priority\n"
-             << "6 - Exit\n";
+        edit_commands_list();
 
         while (selection != "6")
         {
@@ -404,8 +492,27 @@ void TaskList<T>::edit(TaskList<Task>& list)
                     selected_node->priority = new_priority;
                 }
             }
+            else if (selection == "help") 
+            {
+                edit_commands_list();
+            }
+            else if (selection != "6")
+            {
+                cout << "Invalid command, type 'help' for a list of commands\n";
+            }
         }
     }
+}
+
+template<class T>
+void TaskList<T>::edit_commands_list()
+{
+    cout << "1 - Change title\n"
+        << "2 - Change description\n"
+        << "3 - Change due date\n"
+        << "4 - Change status\n"
+        << "5 - Change priority\n"
+        << "6 - Exit\n";
 }
 
 template<class T>
@@ -426,6 +533,48 @@ void TaskList<T>::complite(TaskList<Task>& list)
 
         selected_node->status = "Complited";
     }
+}
+
+template<class T>
+void TaskList<T>::save_to_csv(TaskList<Task>& list)
+{  
+    string filename = "file.csv";
+
+    while (true) {
+        cout << "Enter file name(latters and numbers): ";
+        getline(cin, filename);
+
+        std::regex filenamePattern("^[a-zA-Z0-9_]+$");
+        std::smatch match;
+
+        if (!std::regex_match(filename, match, filenamePattern)) {
+            cout << "Invalid file name\n";
+        }
+        else
+        {
+            break;
+        }
+    }
+    filename += ".csv";
+
+    ofstream file(filename);
+
+    if (!file) 
+    {
+        cout << "Error: Unable to open file for writing!\n";
+        return;
+    }
+
+    file << "ID,Title,Description,Due date,Add date,Status,Priority\n";
+
+    for (const auto& task : nodes)
+    {
+        file << task.toCSV() << endl;
+    }
+
+    file.close();
+    cout << "Tasks saved to " << filename << "\n";
+
 }
 
 int main() {
