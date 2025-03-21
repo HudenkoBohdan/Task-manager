@@ -1,18 +1,14 @@
 ﻿/*
 Функционал проекта
-🔹 Основные возможности :
-✅ Добавление новой задачи(заголовок, описание, срок выполнения, приоритет) - Сделанно
-✅ Просмотр списка задач(отображение активных, выполненных) - Сделанно (Можно добавить режим скрития активных или выполненых) - Добавил
-✅ Редактирование задачи(изменение параметров) - Сделанно
-✅ Удаление задачи - Сделанно
-✅ Пометка задачи как выполненной - Сделанно (Можно сделать через отдельную функцию) - Сделанно
-✅ Сохранение задач в файле(или базе данных) - Сделанно
-✅ Сортировка задач(по сроку, приоритету) - Сделано
-
-🔹 Дополнительные возможности :
-✨ Напоминания(например, если срок выполнения истекает) - Надо посмотреть !!!
-✨ Категории задач(например, "Работа", "Учёба", "Личное") - Надо сделать!!!
-✨ Экспорт задач в JSON / CSV - Сделанно с CSV
+✅ Добавление новой задачи(заголовок, описание, срок выполнения, приоритет)
+✅ Просмотр списка задач(отображение активных, выполненных)
+✅ Редактирование задачи(изменение параметров)
+✅ Удаление задачи
+✅ Пометка задачи как выполненной
+✅ Сохранение задач в файле(или базе данных)
+✅ Сортировка задач(по сроку, приоритету)
+✅ Категории задач(например, "Работа", "Учёба", "Личное")
+✅ Экспорт задач в JSON / CSV - Сделанно с CSV
 */
 
 #include <iostream>
@@ -69,7 +65,7 @@ bool TaskList<T>::date_verification(string date)
 template <class T>
 void TaskList<T>::push_front() {
 
-    string title = "", description = "", due_date = "01-01-01", status = "";
+    string title = "", description = "", category = "", due_date = "01-01-01", status = "";
     int priority = 0;
 
     cout << "Enter title: " << endl;
@@ -78,6 +74,10 @@ void TaskList<T>::push_front() {
 
     cout << "Enter description: " << endl;
     getline(cin, description);
+    cout << endl;
+
+    cout << "Enter category: " << endl;
+    getline(cin, category);
     cout << endl;
 
     while (true) 
@@ -109,17 +109,17 @@ void TaskList<T>::push_front() {
         priority = 5;
     }
 
-    nodes.push_front(T(title, description, due_date, getCurrentDate(), status, priority, id));
+    nodes.push_front(T(title, description, category, due_date, getCurrentDate(), status, priority, id));
 
     id++;
 }
 
 template <class T>
-void TaskList<T>::push_front(string title, string description, string due_date, int priority) {
+void TaskList<T>::push_front(string title, string description, string category, string due_date, int priority) {
 
     string status = "Complited";
 
-    nodes.push_front(T(title, description, due_date, getCurrentDate(), status, priority, id));
+    nodes.push_front(T(title, description, category, due_date, getCurrentDate(), status, priority, id));
 
     id++;
 }
@@ -135,6 +135,8 @@ void TaskList<T>::random_task(TaskList<Task>& list)
         "Deploy the latest update", "Design new user interface", "Update all dependencies",
         "Improve UI/UX for better experience"};
 
+    string category[] = {"Work", "Personal", "Health", "Finance", "Education", "Shopping", "Entertainment", "Travel", "Family", "Hobbies"};
+
     string due_date[] = { "22-03-25", "11-04-25", "04-04-25", "09-04-25", "01-04-25",
         "10-04-25", "28-03-25", "30-03-25", "14-04-25", "02-04-25" };
 
@@ -142,12 +144,12 @@ void TaskList<T>::random_task(TaskList<Task>& list)
 
     for (int i = 0; i < 10; i++) 
     {
-        list.push_front(title[i], description[i], due_date[i], priority[i]);
+        list.push_front(title[i], description[i], category[i], due_date[i], priority[i]);
     }
 }
 
 template <class T>
-void TaskList<T>::print_forward(int hide_active, int hide_complited) {
+void TaskList<T>::print(int hide_active, int hide_complited) {
     if (hide_active == 0 && hide_complited == 0)
     {
         for (auto& data : nodes) 
@@ -184,26 +186,43 @@ void TaskList<T>::print_forward(int hide_active, int hide_complited) {
 
 }
 
+template<class T>
+void TaskList<T>::print(string s_category)
+{
+    for(auto data = nodes.begin(); data != nodes.end(); data++)
+    {
+        string category = data->category;
+        transform(category.begin(), category.end(), category.begin(), ::tolower);
+        transform(s_category.begin(), s_category.end(), s_category.begin(), ::tolower);
+        if (category == s_category)
+        {
+            cout << *data << endl;
+            cout << "=====================================\n";
+        }
+    }
+}
+
 template <class T>
 void TaskList<T>::help() {
     cout << "\n=========== COMMANDS LIST ===========\n"
-        << "Add Task           : add\n"
-        << "Task List          : print\n"
-        << "Delete Task        : del\n"
-        << "Complite Task      : comp\n"
-        << "Sort by priority   : sp\n"
-        << "Sort by status     : ss\n"
-        << "Sort by due date   : sd\n"
-        << "Reverse List       : rt\n"
-        << "Random Task        : rd\n"
-        << "Edit Task          : edit\n"
-        << "Hide Active        : ha\n"
-        << "Hide Complited     : hc\n"
-        << "Save to File       : sf\n"
-        << "Load from File     : lf\n"
-        << "Clear              : clear\n"
-        << "Help               : help\n"
-        << "Exit               : exit\n"
+        << "Add Task               : add\n"
+        << "Task List              : print\n"
+        << "Delete Task            : del\n"
+        << "Complite Task          : comp\n"
+        << "Sort by priority       : sp\n"
+        << "Sort by status         : ss\n"
+        << "Sort by due date       : sd\n"
+        << "Reverse List           : rt\n"
+        << "Random Task            : rd\n"
+        << "Edit Task              : edit\n"
+        << "Hide Active            : ha\n"
+        << "Hide Complited         : hc\n"
+        << "Search by category     : sc\n"
+        << "Save to File           : sf\n"
+        << "Load from File         : lf\n"
+        << "Clear                  : clear\n"
+        << "Help                   : help\n"
+        << "Exit                   : exit\n"
         << "=====================================\n\n";
 }
 
@@ -229,7 +248,7 @@ void TaskList<T>::request(TaskList<Task>& list) {
         }
         else if (userChoice == "print") 
         {
-            list.print_forward(hide_active, hide_complited);
+            list.print(hide_active, hide_complited);
             continue;
         }
         else if (userChoice == "del") 
@@ -301,6 +320,11 @@ void TaskList<T>::request(TaskList<Task>& list) {
                 cout << "Complited tasks are now displayed" << endl;
                 hide_complited = 0;
             }
+            continue;
+        }
+        else if (userChoice == "sc")
+        {
+            search_by_category(list);
             continue;
         }
         else if (userChoice == "sf")
@@ -572,7 +596,7 @@ void TaskList<T>::save_to_csv(TaskList<Task>& list)
         return;
     }
 
-    file << "ID,Title,Description,Due date,Add date,Status,Priority\n";
+    file << "ID,Title,Description,Category,Due date,Add date,Status,Priority\n";
 
     for (const auto& task : nodes)
     {
@@ -623,23 +647,35 @@ void TaskList<T>::load_from_csv(TaskList<Task>& list)
     {
         stringstream ss(line);
         
-        string title, description, due_date, add_date, status, priority, id;
+        string title, description, category, due_date, add_date, status, priority, id;
 
         getline(ss, id, ',');
         getline(ss, title, ',');
         getline(ss, description, ',');
+        getline(ss, category, ',');
         getline(ss, due_date, ',');
         getline(ss, add_date, ',');
         getline(ss, status, ',');
         getline(ss, priority, ',');
 
-        nodes.push_front(T(title, description, due_date, add_date, status, stoi(priority), stoi(id)));
+        nodes.push_front(T(title, description, category, due_date, add_date, status, stoi(priority), stoi(id)));
         list.id++;
     }
 
     file.close();
     cout << "Tasks loaded from " << filename << "\n";
+    nodes.reverse();
 
+}
+
+template<class T>
+void TaskList<T>::search_by_category(TaskList<Task>& list)
+{
+    string s_category;
+    cout << "Enter a category to search: ";
+    getline(cin, s_category);
+    cin.clear();
+    list.print(s_category);
 }
 
 int main() {

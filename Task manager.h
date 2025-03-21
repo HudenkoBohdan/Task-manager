@@ -19,12 +19,13 @@ struct Task
 {
     string title;
     string description;
+    string category;
     string due_date; //format (dd-mm-yy)
     string add_date;
     string status;
     int priority;
     int id;
-    Task(string t, string d, string d_d, string a_d, string s, int p, int i) : title(t), description(d), due_date(d_d), add_date(a_d), status(s), priority(p), id(i) {}
+    Task(string t, string d, string c, string d_d, string a_d, string s, int p, int i) : title(t), description(d), category(c), due_date(d_d), add_date(a_d), status(s), priority(p), id(i) {}
 
     tuple<int, int, int> parseData() const 
     {
@@ -40,7 +41,7 @@ struct Task
     string toCSV() const 
     {
         stringstream ss;
-        ss << id << "," << title << "," << description << "," << due_date << "," << add_date << "," << status << "," << priority;
+        ss << id << "," << title << "," << description << "," << category << "," << due_date << "," << add_date << "," << status << "," << priority;
         return ss.str();
     }
 
@@ -48,6 +49,7 @@ struct Task
     {
         os << "Title: " << task.title << "\n"
             << "Description: " << task.description << "\n"
+            << "Category: " << task.category << "\n"
             << "Due date (dd-mm-yy): " << task.due_date << "\n"
             << "Add date (dd-mm-yy): " << task.add_date << "\n"
             << "Status: " << task.status << "\n"
@@ -70,9 +72,10 @@ private:
     string getCurrentDate();
     bool date_verification(string date);
     void push_front();
-    void push_front(string title, string description, string due_date, int priority);
+    void push_front(string title, string description, string category, string due_date, int priority);
     void random_task(TaskList<Task>& list);// Для тестов
-    void print_forward(int hide_active, int hide_complited);
+    void print(int hide_active, int hide_complited);
+    void print(string s_category);
     void help();
     void del(TaskList<Task>& list);
     void sort_by_priority();
@@ -84,6 +87,7 @@ private:
     void complite(TaskList<Task>& list);
     void save_to_csv(TaskList<Task>& list);
     void load_from_csv(TaskList<Task>& list);
+    void search_by_category(TaskList<Task>& list);
 
 public:
 
